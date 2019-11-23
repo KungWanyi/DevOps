@@ -20,3 +20,45 @@ child = pexpect.spawn('/usr/bin/ssh',['usr@example.com'])
 child = pexpect.spawn('ls',['-lstr','/tmp'])
 
 child = pexpect.spawn('/bin/bash -c "ls -l | grep LOG > logs.txt"')
+child.expect(pexpect.EOF)
+
+
+shell_cmd = 'ls -l | grep LOG > logs.txt'
+child = pexpect.spawn('/bin/bash',['-c',shell_cmd])
+child.expect(pexpect.EOF)
+
+
+#写到日志文件的方法
+child = pexpect.spawn('some_command')
+fout = file('mylog.txt','w')
+child.logfile = fout
+
+
+#输出到标准输出的方法如下
+child = pexpect.spawn('some_command')
+child.logfile = sys.stdout
+
+
+#如下为一个完整的实例，实现远程SSH登录，登录成功后显示/home目录文件清单，并通过日志文件记录所有的输入与输出
+import pexpect
+import sys
+
+child = pexpect.spawn('ssh root@192.168.1.15')
+child.logfile = fout
+#chid.logfile = sys.stdout
+child.expect("password:")
+child.sendline("1qaz@WSX")
+child.expect('#')
+child.sendline('ls /home')
+child.expect('#')
+
+
+#以下为mylog.txt日志内容，可以看到pexpect产生的全部输入与输出信息
+#cat mylog.txt
+root@192.168.1.15's password:1qaz@WSX
+
+
+
+
+#expect(pattern,timeout=-1,searchwindowsize=-1)
+
